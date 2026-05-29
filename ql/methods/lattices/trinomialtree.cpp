@@ -43,7 +43,10 @@ namespace QuantLib {
             //Variance must be independent of x
             Real v2 = process->variance(t, 0.0, dt);
             Volatility v = std::sqrt(v2);
-            dx_.push_back(v*std::sqrt(3.0));
+            Real dxNext = v*std::sqrt(3.0);
+            if (i > 0 && dxNext < dx_[i] * 0.5)
+                dxNext = dx_[i];
+            dx_.push_back(dxNext);
 
             Branching branching;
             for (Integer j=jMin; j<=jMax; j++) {
@@ -59,11 +62,11 @@ namespace QuantLib {
 
                 Real e = m - (x0_ + temp*dx_[i+1]);
                 Real e2 = e*e;
-                Real e3 = e*std::sqrt(3.0);
+                Real dx2 = dx_[i+1]*dx_[i+1];
 
-                Real p1 = (1.0 + e2/v2 - e3/v)/6.0;
-                Real p2 = (2.0 - e2/v2)/3.0;
-                Real p3 = (1.0 + e2/v2 + e3/v)/6.0;
+                Real p1 = (v2 + e2 - e*dx_[i+1]) / (2.0*dx2);
+                Real p2 = 1.0 - (v2 + e2) / dx2;
+                Real p3 = (v2 + e2 + e*dx_[i+1]) / (2.0*dx2);
 
                 branching.add(temp, p1, p2, p3);
             }

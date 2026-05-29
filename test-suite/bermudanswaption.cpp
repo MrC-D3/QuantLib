@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(testCachedValues) {
     if (!usingAtParCoupons) {
         itmValue = 42.1791; atmValue = 12.7699; otmValue = 2.4368;
     } else {
-        itmValue = 42.1849; atmValue = 12.7736; otmValue = 2.4379;
+        itmValue = 42.1845; atmValue = 12.7712; otmValue = 2.43878;
     }
 
     swaption = Swaption(itmSwap, exercise);
