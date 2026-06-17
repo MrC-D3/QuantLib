@@ -21,6 +21,7 @@
 
 #include <ql/indexes/iborindex.hpp>
 #include <ql/termstructures/yieldtermstructure.hpp>
+#include <ql/settings.hpp>
 #include <utility>
 
 namespace QuantLib {
@@ -90,6 +91,23 @@ namespace QuantLib {
                                                 fixingCalendar(),
                                                 dayCounter(),
                                                 h);
+    }
+
+    Rate OvernightIndex::fixing(const Date& fixingDate,
+                                bool forecastTodaysFixing) const {
+        Date today = Settings::instance().evaluationDate();
+        if (fixingDate == today && !forecastTodaysFixing) {
+            Rate h = pastFixing(today);
+            if (h != Null<Real>())
+                return h;
+            // Fall back to yesterday's fixing as the best available value
+            Date yesterday = fixingCalendar().advance(today, -1, Days);
+            h = pastFixing(yesterday);
+            if (h != Null<Real>())
+                return h;
+            // no historical fixing available at all: fall through to forecast
+        }
+        return InterestRateIndex::fixing(fixingDate, forecastTodaysFixing);
     }
 
 }

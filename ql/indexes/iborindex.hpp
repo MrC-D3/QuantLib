@@ -95,6 +95,12 @@ namespace QuantLib {
                        const Handle<YieldTermStructure>& h = {});
         //! returns a copy of itself linked to a different forwarding curve
         ext::shared_ptr<IborIndex> clone(const Handle<YieldTermStructure>& h) const override;
+        /*! Returns the fixing for the given date, applying the publication lag of
+            overnight indexes: when fixingDate equals today and no fixing has been
+            published yet, falls back to yesterday's fixing instead of forecasting
+            from the curve. */
+        Rate fixing(const Date& fixingDate,
+                    bool forecastTodaysFixing = false) const override;
     };
 
 
